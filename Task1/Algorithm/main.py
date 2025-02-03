@@ -38,7 +38,7 @@ class Main:
             [50, 50, Direction.TOP],
             [90, 90, Direction.BOTTOM],
             [40, 180, Direction.BOTTOM],
-            [120, 150, Direction.RIGHT],
+            [10, 150, Direction.RIGHT],
             [150, 40, Direction.LEFT],
             [190, 190, Direction.LEFT]
         ]
@@ -303,5 +303,5 @@ if __name__ == '__main__':
     Simulator 
     Rpi Connection
     """
-    # sim()
-    initialize()
+    sim()
+    #initialize()
