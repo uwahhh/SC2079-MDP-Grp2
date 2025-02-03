@@ -300,9 +300,8 @@ def test():
 
 if __name__ == '__main__':
     """
-    Start the interactive Pygame window for obstacle clicking.
+    Simulator 
+    Rpi Connection
     """
-    algo = AlgoMinimal([])  # Start with an empty grid
-    algo.execute()  # Run the event loop
-
-
+    # sim()
+    initialize()

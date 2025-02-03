@@ -1,22 +1,11 @@
 import constants as constants
 from misc.positioning import Position
-import pygame
+
 
 class GridCell:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def draw(self, screen):
-        """
-        Draws the grid cell on the Pygame screen.
-        """
-        pygame.draw.rect(
-            screen,
-            (200, 200, 200),  # Light gray color
-            pygame.Rect(self.x, self.y, constants.GRID_CELL_LENGTH, constants.GRID_CELL_LENGTH),
-            1  # Border thickness
-        )
+    def __init__(self, position, occupied):
+        self.position = position
+        self.occupied = occupied
 
     def __str__(self):
         return f"Cell({self.position})"
