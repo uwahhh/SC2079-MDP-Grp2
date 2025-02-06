@@ -34,14 +34,7 @@ class Main:
         return obs
 
     def run_simulator(self):
-        world1 = [
-            [50, 50, Direction.TOP],
-            [90, 90, Direction.BOTTOM],
-            [40, 180, Direction.BOTTOM],
-            [10, 150, Direction.RIGHT],
-            [150, 40, Direction.LEFT],
-            [190, 190, Direction.LEFT]
-        ]
+        world1 = []
         obstacles = []
         i = 0
         for x, y, direction in world1:

@@ -8,9 +8,21 @@ from commands.turn_command import TurnCommand
 from commands.scan_obstacle_command import ScanCommand
 from misc.direction import Direction
 from misc.type_of_turn import TypeOfTurn
+from grid.obstacle import Obstacle
 
+class Position:
+    def __init__(self, x, y, direction):
+        self.x = x
+        self.y = y
+        self.direction = direction
 
 class Simulation():
+    def rotate_direction(self, direction):
+        order = [Direction.TOP, Direction.RIGHT, Direction.BOTTOM, Direction.LEFT]
+        idx = order.index(direction)
+        return order[(idx + 1) % len(order)]
+
+
     def __init__(self):
         pygame.init()
         self.running = True
@@ -31,6 +43,8 @@ class Simulation():
                       currentPosX) // 10, currentPosY // 10, direction)
         cls.bot.setCurrentPos(currentPos[0], currentPos[1], currentPos[2])
         cls.bot.hamiltonian.commands.clear()
+        cls.obstacles = []
+        cls.bot.hamiltonian.grid.obstacles = cls.obstacles
 
     def selectObstacles(cls, y, x, cellSize, color):
         newRect = pygame.Rect(y * cellSize, x * cellSize, cellSize, cellSize)
@@ -1117,17 +1131,54 @@ class Simulation():
         self.bot = deepcopy(bot)
         self.clock = pygame.time.Clock()
         self.obstacles = self.bot.hamiltonian.grid.obstacles
+        grid_pixel_height = constants.GRID_LENGTH * constants.SCALING_FACTOR
         start = None
         while True:
             self.updatingDisplay()
-            x, y = pygame.mouse.get_pos()
+            # Get raw mouse position (with 0 at top)
+            raw_x, raw_y = pygame.mouse.get_pos()
+            grid_pixel_height = constants.GRID_LENGTH * constants.SCALING_FACTOR
+
+            # Use different coordinates based on the area clicked:
+            if raw_x < 650:  
+                # In grid area, flip the y-coordinate:
+                x = raw_x
+                y = grid_pixel_height - raw_y
+            else:
+                # In button area, use raw coordinates:
+                x = raw_x
+                y = raw_y
             self.draw(x, y)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if (650 < x < 650 + constants.BUTTON_LENGTH) and (500 < y < 500 + constants.BUTTON_WIDTH):
+                    # If click is in the grid area (assume grid is x < 650)
+                    if x < 650:
+                        cell_size = constants.GRID_CELL_LENGTH * constants.SCALING_FACTOR
+                        cell_x = x // cell_size
+                        cell_y = y // cell_size
+                        # Look for an existing obstacle in that cell
+                        found = False
+                        for obs in self.obstacles:
+                            obs_cell_x = obs.position.x // constants.GRID_CELL_LENGTH
+                            obs_cell_y = obs.position.y // constants.GRID_CELL_LENGTH
+                            if obs_cell_x == cell_x and obs_cell_y == cell_y:
+                                obs.position.direction = self.rotate_direction(obs.position.direction)
+                                found = True
+                                break
+                        if not found:
+                            pos = Position(cell_x * constants.GRID_CELL_LENGTH,
+                            cell_y * constants.GRID_CELL_LENGTH, Direction.TOP)
+                            new_obs = Obstacle(pos, len(self.obstacles))
+
+                            self.obstacles.append(new_obs)
+                            self.bot.hamiltonian.grid.obstacles = self.obstacles
+
+
+
+                    elif (650 < x < 650 + constants.BUTTON_LENGTH) and (500 < y < 500 + constants.BUTTON_WIDTH):
                         print(
                             "START BUTTON IS CLICKED!!! I REPEAT, START BUTTON IS CLICKED!!!")
                         '''insert run algo function'''
